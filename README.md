@@ -21,11 +21,22 @@ Kubernetes по русски, план скринкастов
  - https://servers.com 
  - https://cloud.google.com
 
-### Как аллоцировать новые k8s ноды
+### Как аллоцировать новые k8s ноды у хостинг провайдера
 - Через terraform
 
 ### Как накатывать новые ноды
 - http://kubespray.io/documents/
+- свой ansible playbook из hard-way?
+
+### Авторизация по ssh на нодах?
+
+### RBAC авторизация в k8s?
+
+### SSO + LDAP ?
+
+# CI/CD - code quality
+- https://sonarcloud.io/ + github + bitbucket
+- https://travis-ci.com/plans vs https://circleci.com/pricing/
 
 # Базы данных
 - MySQL - https://github.com/oracle/mysql-operator
