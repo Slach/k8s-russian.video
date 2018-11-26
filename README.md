@@ -56,3 +56,7 @@ Kubernetes по русски, план скринкастов
 - https://github.com/apache/incubator-superset
 - https://github.com/Vertamedia/clickhouse-grafana
 - https://github.com/metabase/metabase/issues/3332
+
+
+# Что есть проще чем k8s? 
+- https://rancher.com/docs/rancher/v2.x/en/
