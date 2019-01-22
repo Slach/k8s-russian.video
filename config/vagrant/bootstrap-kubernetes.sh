@@ -118,9 +118,9 @@ if hostnameMatches master1; then
     # If you add nodes later you will need to get a new kubeadm token.
     # Just run the following command on k8s-master1 before the vagrant up of a new node.
     KUBEADM_JOIN=$(kubeadm token create --print-join-command)
-    # Fucking Vagrant NAT default route ;(
-    KUBEADM_JOIN="${KUBEADM_JOIN} -v 3 --ignore-preflight-errors=\"FileAvailable--etc-kubernetes-pki-ca.crt\""
-    KUBEADM_JOIN="${KUBEADM_JOIN} --experimental-control-plane"
+    KUBEADM_JOIN="${KUBEADM_JOIN} -v 3"
+    # howto setup prefered bind ip for kubeadm, without Vagrant NAT default internal IP? ;(
+    # KUBEADM_JOIN="${KUBEADM_JOIN} --experimental-control-plane"
     if [[ "${USE_DOCKER}" == "False" ]]; then
         KUBEADM_JOIN="${KUBEADM_JOIN} --cri-socket=/var/run/crio/crio.sock"
     fi
