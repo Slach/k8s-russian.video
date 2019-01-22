@@ -1,0 +1,13 @@
+vagrant:
+  k8s-master1:
+    vm:
+      ip: "10.4.2.10"
+  k8s-node1:
+    vm:
+      ip: "10.4.2.11"
+  k8s-node2:
+    vm:
+      ip: "10.4.2.12"
+  k8s-node3:
+    vm:
+      ip: "10.4.2.13"

@@ -1,1 +1,6 @@
 .idea/
+config/vagrant/kube-join.sh
+config/vagrant/kubeadm-ha.yaml
+config/vagrant/kubernetes/
+.vagrant/
+*.log
