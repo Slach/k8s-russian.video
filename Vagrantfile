@@ -29,6 +29,10 @@ Vagrant.configure("2") do |config|
       config.vm.provider :virtualbox do |host|
         host.cpus = server["cpu"]
       end
+    else
+      config.vm.provider :virtualbox do |host|
+        host.cpus = 2
+      end
     end
 
   end

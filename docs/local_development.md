@@ -16,7 +16,7 @@
     - удлиняет цикл разработки, кроме kubernetes/*.yml придется поддерживать свой packs/*.yml и helm
     - нельзя multinode k8s
 - https://github.com/windmilleng/tilt
-    - меньше скрывают от разработчика процесс deployment в кластер, но более понятный конфиг чем у draft 
+    - меньше скрывают от разработчика процесс deployment в кластер, более понятный конфиг чем у draft 
 
 - https://github.com/kubernetes/minikube
     - крутая вещь, подходит всем, но нельзя local multi-node k8s https://github.com/kubernetes/minikube/issues/94
@@ -26,14 +26,15 @@
     - и еще на старых OS - windows 7 / osx < 10.9 все равно будет через boot2docker + virtualbox 
 
                    
-### Буду пилить свой Vagrantfile + public vagrantbox и single+multi node k8s?
+### Буду пилить свой Vagrantfile + public vagrantbox и single/multi-master k8s!
 - Запилил - https://github.com/Slach/vagrant-kubernetes, https://app.vagrantup.com/Slach/boxes/vagrant-kubernetes
 - Внутри ubuntu 18.04 + cri-o + kubeadm + kube-router все ставим из apt, за основу взяты:
     - https://github.com/andygabby/bionic64-k8s 
     - cri-o - https://launchpad.net/~projectatomic/+archive/ubuntu/ppa
     - https://coreos.com/etcd/docs/latest/tuning.html - тюнинг ETCD hight latency 
 - Авторизацией сервисов по SSL сертификатам? 
-    - ca.pem и т.п. генерируется через kubeadm init, распостранение сертификатов через kubeadm join
+    - ca.pem и т.п. генерируется через kubeadm init
+    - распостранение сертификатов увы через Vagrant shared synced folder /vagrant/ 
     
 - Как правильно проверить security настройки kubernetes
     - https://github.com/aquasecurity/kube-bench  
@@ -46,7 +47,7 @@
 - Как опубликовать свой vagrant box на vagrant cloud:
 
     - https://www.vagrantup.com/docs/cli/cloud.html#cloud-publish
-- Непонятно как делать secrets для "локальной разработки"
+- Непонятно как делать secrets для "локальной разработки"?
 - придется поддерживать два Dockerfile на каждый application, один "для разработки", второй production + multi-stage?
     - как сделать localVolume и проброс файлов?
     - как сделать аналог docker-compose restart?

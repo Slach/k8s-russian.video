@@ -8,3 +8,5 @@ vagrant destroy -f || true
 rm -rfv ${HACK_DIR}/../config/vagrant/kubernetes/*
 vagrant up k8s-master1 --provision
 vagrant up k8s-node1 --provision
+vagrant up k8s-node2 --provision
+vagrant up k8s-node3 --provision

@@ -18,7 +18,8 @@ Kubernetes по русски, ссылки и ответы на вопросы
 ### RBAC в k8s как оно работает?
 
 ### SSO + LDAP ?
-- ставить multi-master reOpenLDAP на каждый сервер?
+- ставить multi-master reOpenLDAP на каждый сервер? нужно сделать .deb пакет для этого
+- https://github.com/krishnapmv/k8s-ldap
 - https://github.com/jirutka/ssh-ldap-pubkey
 - https://github.com/leo-yuriev/ReOpenLDAP
 - https://eng.ucmerced.edu/soe/computing/services/ssh-based-service/ldap-ssh-access
