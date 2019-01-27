@@ -110,11 +110,11 @@ Kubernetes по русски, ссылки и ответы на вопросы
 - https://github.com/metabase/metabase/issues/3332
 - https://blog.ubuntu.com/2018/12/10/using-gpgpus-with-kubernetes
 - https://github.com/jupyterhub/zero-to-jupyterhub-k8s
+- https://github.com/kubeflow
 
 # Что есть проще чем k8s? 
 - https://rancher.com/docs/rancher/v2.x/en/
 - https://github.com/lastbackend/lastbackend
-- https://github.com/ehazlett/stellar
 - https://stellarproject.io/
 
 # Security 

@@ -5,12 +5,21 @@ USE_DOCKER=False
 LOCAL_ETCD=False
 
 VAGRANT_CFG=/vagrant/config/vagrant
-# TODO: Support dynamic ip ranges so 10.4 doesnt need to be hard coded.
+mkdir -p ${VAGRANT_CFG}/kubernetes/
+
+# TODO: Support dynamic ip ranges so 10.4 doesn't need to be hard coded.
 # TODO: dynamically pull k8s-master1 address instead of hard coded.
 LEAD_OCTETS=10.4
 SERVER_IP=$(ip -f inet -o addr show | grep ${LEAD_OCTETS} | awk '{split($4,a,"/");print a[1]}' | tr -d '\n')
 modprobe ip_vs ip_vs_rr ip_vs_wrr ip_vs_sh
 modprobe br_netfilter
+
+if [[ "${LOCAL_ETCD}" == "False" ]]; then
+    mkdir -p /var/lib/etcd
+fi
+
+chmod 0700 /var/lib/etcd
+chmod 0700 /opt/cni/bin
 
 if [[ "${LOCAL_ETCD}" != "False" ]]; then
     systemctl enable etcd
@@ -47,8 +56,6 @@ kind: ClusterConfiguration
 kubernetesVersion: stable
 controlPlaneEndpoint: "${SERVER_IP}:6443"
 apiServer.extraArgs.advertise-address: "${SERVER_IP}"
-apiServer.extraArgs.anonymous-auth: "true"
-apiServer.extraArgs.enable-aggregator-routing: "true"
 controllerManager.extraArgs.allocate-node-cidrs: "true"
 controllerManager.extraArgs.service-cluster-ip-range: "10.99.0.0/16"
 networking.podSubnet: "10.244.0.0/16"
@@ -60,8 +67,51 @@ etcd.local.extraArgs.listen-client-urls: "https://0.0.0.0:2379"
 etcd.local.extraArgs.listen-peer-urls: "https://0.0.0.0:2380"
 etcd.local.serverCertSANs[+]: ${SERVER_IP}
 etcd.local.peerCertSANs[+]: ${SERVER_IP}
+
+# kube-bench recommendations
+# apiServer.extraArgs.anonymous-auth: "false"
+apiServer.extraArgs.profiling: "false"
+apiServer.extraArgs.repair-malformed-updates: "false"
+apiServer.extraArgs.admission-control-config-file: "/etc/kubernetes/pki/admission-control.conf"
+# ,PodSecurityPolicy
+apiServer.extraArgs.enable-admission-plugins: "NodeRestriction,EventRateLimit,ServiceAccount,AlwaysPullImages,SecurityContextDeny,DenyEscalatingExec"
+apiServer.extraArgs.audit-log-path: "/var/log/kube-apiserver-audit.log"
+apiServer.extraArgs.audit-log-maxage: "30"
+apiServer.extraArgs.audit-log-maxbackup: "10"
+apiServer.extraArgs.audit-log-maxsize: "100"
+# apiServer.extraArgs.kubelet-certificate-authority: "/etc/kubernetes/pki/ca.crt"
+apiServer.extraArgs.service-account-lookup: "true"
+apiServer.extraArgs.tls-cipher-suites: "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_128_GCM_SHA256"
+
+scheduler.extraArgs.profiling: "false"
+controllerManager.extraArgs.profiling: "false"
+controllerManager.extraArgs.terminated-pod-gc-threshold: "100"
+controllerManager.extraArgs.feature-gates: "RotateKubeletServerCertificate=true"
+
 EOF
 
+mkdir -p /etc/kubernetes/pki/etcd/
+
+cat > /etc/kubernetes/pki/admission-control.conf << EOF
+kind: AdmissionConfiguration
+apiVersion: apiserver.k8s.io/v1alpha1
+plugins:
+- name: EventRateLimit
+  path: /etc/kubernetes/pki/admission-EventRateLimit.conf
+EOF
+
+cat > /etc/kubernetes/pki/admission-EventRateLimit.conf << EOF
+kind: Configuration
+apiVersion: eventratelimit.admission.k8s.io/v1alpha1
+limits:
+- type: Namespace
+  qps: 100
+  burst: 200
+  cacheSize: 2000
+- type: User
+  qps: 100
+  burst: 200
+EOF
 
 KUBEADM_CLUSTER_CONFIG=${VAGRANT_CFG}/kubernetes/kubeadm-clusterconfig.yaml
 KUBEADM_JOIN_CONFIG=${VAGRANT_CFG}/kubernetes/kubeadm-joinconfig.yaml
@@ -115,6 +165,7 @@ if hostnameMatches master1; then
     cp -fv /etc/kubernetes/pki/etcd/ca.crt ${VAGRANT_CFG}/kubernetes/pki/etcd/
     cp -fv /etc/kubernetes/pki/etcd/ca.key ${VAGRANT_CFG}/kubernetes/pki/etcd/
     cp -fv /etc/kubernetes/admin.conf ${VAGRANT_CFG}/kubernetes/
+    cp -fv /etc/kubernetes/pki/admission*.conf ${VAGRANT_CFG}/kubernetes/
 
     KUBECONFIG=/etc/kubernetes/admin.conf kubectl get configmaps -n kube-system kubeadm-config -o yaml > ${KUBEADM_CONFIG_MAP}
     KUBEADM_CONFIG_STATUS=$(yq r ${KUBEADM_CONFIG_MAP} data.ClusterStatus | yq w - apiEndpoints.${HOSTNAME}.advertiseAddress ${SERVER_IP})
@@ -128,7 +179,7 @@ if hostnameMatches master1; then
         echo "All Kubernetes pods is not yet ready"
         sleep 3
     done
-    # If you add nodes later you will need to get a new kubeadm token.
+    # If you add nodes later than 24 hours you will need to get a new kubeadm token.
     # Just run the following command on k8s-master1 before the vagrant up of a new node.
     KUBEADM_JOIN_TOKEN=$(kubeadm token create)
     KUBEADM_JOIN_CA=/etc/kubernetes/pki/ca.crt
@@ -151,6 +202,9 @@ EOF
     echo "apiVersion: kubeadm.k8s.io/v1beta1" >  ${KUBEADM_JOIN_CONFIG}
     yq w -i -s ${TMPDIR}/kubeadm_join.yq ${KUBEADM_JOIN_CONFIG}
     echo "${KUBEADM_JOIN} --config=${KUBEADM_JOIN_CONFIG} --ignore-preflight-errors=DirAvailable--etc-kubernetes-manifests" > ${VAGRANT_CFG}/kubernetes/kubeadm-join.sh
+
+    # security checks
+    KUBECONFIG=/etc/kubernetes/admin.conf kubectl apply -f https://raw.githubusercontent.com/aquasecurity/kube-bench/master/job-master.yaml
 fi
 
 if hostnameMatches node; then
@@ -160,6 +214,8 @@ if hostnameMatches node; then
     done
     rm -rf /etc/kubernetes/*
     mkdir -p /etc/kubernetes/
+    # Restore kubernetes node config from Vagrant shared folder
+    # TODO: need more elastic solution
     cp -rfv ${VAGRANT_CFG}/kubernetes/* /etc/kubernetes/
 
     echo "Kubernetes master is ready. Proceeding to join the cluster."
@@ -197,6 +253,18 @@ EOF
 fi
 
 sleep 10
-# KUBECONFIG=/etc/kubernetes/admin.conf kubectl taint nodes --all node-role.kubernetes.io/master- || true
+KUBECONFIG=/etc/kubernetes/admin.conf kubectl taint nodes --all node-role.kubernetes.io/master- || true
+
 KUBECONFIG=/etc/kubernetes/admin.conf kubectl get nodes -o wide
-KUBECONFIG=/etc/kubernetes/admin.conf kubectl get pod -o wide --all-namespaces --include-uninitialized
+KUBECONFIG=/etc/kubernetes/admin.conf kubectl get pod -o wide --all-namespaces --include-uninitialized | grep ${HOSTNAME}
+
+while [[ "0" == $(KUBECONFIG=/etc/kubernetes/admin.conf kubectl get pods -o wide | grep kube-bench | grep -i completed | wc -l) ]];
+do
+    echo "Kube bench security check is not yet ready"
+    sleep 3
+done
+KUBE_BENCH_POD=$(KUBECONFIG=/etc/kubernetes/admin.conf kubectl get pods -o wide | grep kube-bench | grep ${HOSTNAME} | grep -i completed | cut -d " " -f 1)
+KUBE_BENCH_FAILS=$(KUBECONFIG=/etc/kubernetes/admin.conf kubectl logs ${KUBE_BENCH_POD} | grep -E '\[FAIL\]')
+if [[ "0" != $(echo ${KUBE_BENCH_FAILS} | wc -l) ]]; then
+    KUBECONFIG=/etc/kubernetes/admin.conf kubectl logs ${KUBE_BENCH_POD}
+fi
