@@ -107,7 +107,6 @@ limits:
 - type: Namespace
   qps: 100
   burst: 200
-  cacheSize: 2000
 - type: User
   qps: 100
   burst: 200
@@ -263,7 +262,7 @@ do
     echo "Kube bench security check is not yet ready"
     sleep 3
 done
-KUBE_BENCH_POD=$(KUBECONFIG=/etc/kubernetes/admin.conf kubectl get pods -o wide | grep kube-bench | grep ${HOSTNAME} | grep -i completed | cut -d " " -f 1)
+KUBE_BENCH_POD=$(KUBECONFIG=/etc/kubernetes/admin.conf kubectl get pods -o wide | grep kube-bench | grep -i completed | head -n 1 | cut -d " " -f 1)
 KUBE_BENCH_FAILS=$(KUBECONFIG=/etc/kubernetes/admin.conf kubectl logs ${KUBE_BENCH_POD} | grep -E '\[FAIL\]')
 if [[ "0" != $(echo ${KUBE_BENCH_FAILS} | wc -l) ]]; then
     KUBECONFIG=/etc/kubernetes/admin.conf kubectl logs ${KUBE_BENCH_POD}

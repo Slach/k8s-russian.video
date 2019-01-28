@@ -61,16 +61,18 @@ Kubernetes по русски, ссылки и ответы на вопросы
 - Через terraform?
 
 ### Multi Cloud Kubernetes
+- https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress/ - глубокая бета, работает только в GKE
+- https://github.com/rook/rook - Storage Orchestration
+- https://github.com/google/metallb - L2 Load Balancer 
 - https://crossplane.io
 - https://github.com/banzaicloud/pipeline
 - https://github.com/kubicorn/kubicorn
 - https://containership.io/
-- https://github.com/GoogleCloudPlatform/k8s-multicluster-ingress/ - глубокая бета, работает только в GKE
  
 
 # CI/CD - code quality
 - https://sonarcloud.io/ + github + bitbucket
-- https://travis-ci.com/plans vs https://circleci.com/pricing/
+- https://travis-ci.com/plans vs https://circleci.com/pricing/ vs https://drone.io/enterprise/
 - https://golangci.com/
 - https://github.com/python-security/pyt
 
