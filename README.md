@@ -76,8 +76,8 @@ Kubernetes по русски, ссылки и ответы на вопросы
 - https://golangci.com/
 - https://github.com/python-security/pyt
 
-# Базы данных
-- MySQL - https://github.com/oracle/mysql-operator, https://vitess.io
+# Базы данных (то что рассмотрю обязательно) + [отдельные описания интересных DB-aware продуктов](docs/databases.md)
+- MySQL - https://github.com/oracle/mysql-operator, https://vitess.io (DBaaS - https://planetscale.com/)
 - PostgreSQL - https://github.com/sorintlab/stolon
 - CockroachDB - https://www.cockroachlabs.com/campaigns/kubernetes/
 

@@ -92,6 +92,7 @@ EOF
 
 mkdir -p /etc/kubernetes/pki/etcd/
 
+# @TODO /etc/kubernetes/pki/ is ugly hack, maybe we need manual kubeadm init phase manifests and change VolumePath in kube-apiserver.yaml
 cat > /etc/kubernetes/pki/admission-control.conf << EOF
 kind: AdmissionConfiguration
 apiVersion: apiserver.k8s.io/v1alpha1
@@ -100,6 +101,7 @@ plugins:
   path: /etc/kubernetes/pki/admission-EventRateLimit.conf
 EOF
 
+# @TODO /etc/kubernetes/pki/ is ugly hack, maybe we need manual kubeadm init phase manifests and change VolumePath in kube-apiserver.yaml
 cat > /etc/kubernetes/pki/admission-EventRateLimit.conf << EOF
 kind: Configuration
 apiVersion: eventratelimit.admission.k8s.io/v1alpha1
