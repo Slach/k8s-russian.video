@@ -2,3 +2,5 @@
 config/vagrant/kubernetes/
 .vagrant/
 *.log
+.terraform/
+*.pem

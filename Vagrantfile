@@ -4,10 +4,14 @@
 require 'yaml'
 require 'securerandom'
 
-servers = YAML.load_file(File.join(File.dirname(__FILE__), 'config/vagrant/servers.yaml'))
+servers = YAML.load_file(File.join(File.dirname(__FILE__), "config/vagrant/servers.yaml"))
+provision_env = {
+    "USE_CRI" => ENV["USE_CRI"] || "containerd",
+}
+vm_box = "Slach/kubernetes-" + provision_env["USE_CRI"]
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "Slach/vagrant-kubernetes"
+  config.vm.box = vm_box
 
   servers['vagrant'].each do |name, server|
     config.vm.define name do |host|
@@ -37,6 +41,6 @@ Vagrant.configure("2") do |config|
 
   end
 
-  config.vm.provision :shell, path: "config/vagrant/bootstrap-kubernetes.sh", :privileged => true
+  config.vm.provision :shell, path: "config/vagrant/bootstrap-kubernetes.sh", :privileged => true, env: provision_env
 
 end
