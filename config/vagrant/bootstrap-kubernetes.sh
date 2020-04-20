@@ -62,6 +62,8 @@ kind: ClusterConfiguration
 kubernetesVersion: stable
 controlPlaneEndpoint: "${SERVER_IP}:6443"
 apiServer.extraArgs.advertise-address: "${SERVER_IP}"
+# significant decrease memory usage by apiserver but increase read usage etcd
+apiServer.extraArgs.watch-cache: "false"
 controllerManager.extraArgs.allocate-node-cidrs: "true"
 controllerManager.extraArgs.service-cluster-ip-range: "10.99.0.0/16"
 networking.podSubnet: "10.244.0.0/16"

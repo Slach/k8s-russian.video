@@ -22,21 +22,31 @@ Kubernetes по русски, ссылки и ответы на вопросы
 - как ставить k8s в условиях spot instances?
 
 ### Как вести менеджмент манифестов
-- Чем плох Helm?
+- Чем плох Helm? - Helm3 хорош
 - https://kustomize.io/
-- https://docs.shipper-k8s.io/en/latest/
 - https://github.com/shyiko/kubetpl + https://m0rk.space/posts/2018/Aug/21/deploying-on-kubernetes-using-circleci-and-kubetpl/
 
 
+### Как катить релизы canary deployments
+- https://docs.shipper-k8s.io/en/latest/
+
 ### Авторизация по ssh на нодах через SSH Bastion?
 - https://github.com/iamacarpet/ssh-bastion
+- https://github.com/ssh-vault/ssh-vault
+- https://github.com/moul/sshportal
 
 ### RBAC в k8s как оно работает?
 - Обычных юзеров менеджерить надо отдельно
+- https://github.com/sighupio/permission-manager - кажется это то что надо
 - https://habr.com/ru/company/flant/blog/422801/
 
 ### Менеджмент секретов
+- https://github.com/kubevault
+- https://github.com/hashicorp/vault-k8s
 - https://itnext.io/can-kubernetes-keep-a-secret-it-all-depends-what-tool-youre-using-498e5dee9c25 - https://github.com/Soluto/kamus
+
+### backup Kubernetes
+- https://github.com/catalogicsoftware/kubedr
 
 ### SSO + LDAP ?
 - https://github.com/appliedtrust/goklp

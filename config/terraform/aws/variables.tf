@@ -50,12 +50,12 @@ variable "az" {
 }
 
 variable "kubernetes-version" {
-  default = "1.15.0"
+  default = "1.17.3"
   description = "Which version of Kubernetes to install"
 }
 
 variable "helm-version" {
-  default = "1.14.3"
+  default = "3.1.0"
   description = "Which version of Helm to install"
 }
 
